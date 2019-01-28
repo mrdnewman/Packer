@@ -1,0 +1,17 @@
+
+
+Packer -- Hashi-Corp tool for creating (((Pre-Baked MACHINE IMAGES)))
+       -- Support all OS's
+          -- AWS/AMIs for EC2, VMDK/VMX(VMware), OVF(VirtualBox), etc. 
+
+NUTSHELL:
+Packer AUTOMATES MACHINE IMAGE creation of ANY type for MULTIPLE PLATFORMS 
+from SINGLE SOURCE CONFIG FILE ...
+
+
+
+         
+
+
+
+
