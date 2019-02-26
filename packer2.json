@@ -1,0 +1,84 @@
+{   
+   "variables": {
+
+       "build_region": "{{env `b_rgn`}}",
+       "build_vpc": "{{env `b_vpc`}}",
+       "build_sn": "{{env `b_sn`}}",
+       "BUILD_URL": "{{env `BUILD_URL`}}",
+       "GIT_URL": "{{env `GIT_URL`}}",
+       "GIT_BRANCH": "{{env `GIT_BRANCH`}}",
+       "GIT_COMMIT": "{{env `GIT_COMMIT`}}",
+       "artifact": "{{env `b_artifact`}}",  
+       "version": "{{env `version`}}",
+       "REDIS_URL": "{{env `redis_url`}}",
+       "insttype": "voms"
+
+     },
+    
+    "builders": [{
+
+      "type": "amazon-ebs",
+      "profile": "default",
+      "region": "{{user `build_region`}}",
+      "vpc_id": "{{user `build_vpc`}}",
+      "associate_public_ip_address": true,
+      "source_ami": "ami-e1496384", 
+      "instance_type": "t2.large",
+      "ssh_username": "centos",
+      "ami_name": "stc.packerbuild.voms-{{timestamp}}",
+      "iam_instance_profile": "stc-packerbuild-bucket-accessrole",
+      "tags": {
+        "SourceAMI": "ami-e1496384", 
+	"OS": "centos7",
+        "Name": "voms_{{user `customer`}}_{{user `version`}}-{{timestamp}}",
+        "Version": "{{timestamp}}",
+        "PBPName": "stc.packerbuild.voms",
+	"artifact": "{{user `artifact`}}"
+
+        }
+    }],
+
+    "provisioners": [
+
+      {
+        "type": "shell",
+        "script": "./install_update.sh"
+      },
+      {
+        "type": "shell",
+        "script": "./install_redis.sh",
+        "environment_vars":[
+          "REDIS_URL={{user `REDIS_URL`}}"
+        ]
+      },
+      {
+        "type" : "shell",
+        "inline": [
+          "sudo adduser node"
+        ]
+      },
+      {
+        "type": "shell",
+        "script": "./install_node.sh"
+      },
+      {
+        "type": "file",
+        "source": "apps.json",
+        "destination": "/tmp/apps.json"
+      },
+      {
+        "type": "file",
+        "source": "process.json",
+        "destination": "/tmp/process.json"
+      },
+      {
+        "type": "shell",
+        "script": "./provision.sh",
+        "environment_vars": [
+          "artifact={{user `artifact`}}",
+          "insttype={{user `insttype`}}"
+        ]
+      }
+    ]
+
+}
